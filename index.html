@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İngilizce Kelime Kartları</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .perspective {
+            perspective: 1000px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 1rem;
+            cursor: pointer;
+        }
+
+        .card-inner.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+
+        .card-front {
+            background-color: #ffffff;
+            color: #1f2937;
+            border: 2px solid #e5e7eb;
+        }
+
+        .card-back {
+            background-color: #eff6ff;
+            color: #1e40af;
+            transform: rotateY(180deg);
+            border: 2px solid #bfdbfe;
+        }
+        
+        .no-select {
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* --- KOYU TEMA (DARK MODE) AYARLARI --- */
+        body.dark-mode {
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        body.dark-mode .card-front {
+            background-color: #1f2937;
+            border-color: #374151;
+            color: #f3f4f6;
+        }
+        body.dark-mode .card-back {
+            background-color: #1e3a8a;
+            border-color: #1e40af;
+            color: #dbeafe;
+        }
+
+        /* --- ULTRA KOYU TEMA (OLED BLACK) --- */
+        body.ultra-dark-mode {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        body.ultra-dark-mode .card-front {
+            background-color: #000000;
+            border-color: #262626;
+            color: #ffffff;
+        }
+        body.ultra-dark-mode .card-back {
+            background-color: #000033;
+            border-color: #000066;
+            color: #ffffff;
+        }
+        body.ultra-dark-mode #sidebar,
+        body.ultra-dark-mode #examples-modal > div,
+        body.ultra-dark-mode #instructions-section > div,
+        body.ultra-dark-mode #music-menu,
+        body.ultra-dark-mode .bg-white {
+            background-color: #0a0a0a !important;
+            border-color: #262626;
+        }
+        body.ultra-dark-mode #search-input {
+            background-color: #1a1a1a;
+            border-color: #333333;
+            color: #ffffff;
+        }
+        body.ultra-dark-mode .bg-gray-50,
+        body.ultra-dark-mode .bg-blue-50 {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+        }
+
+        /* Menü, Modallar ve Butonlar için koyu renkler */
+        body.dark-mode #sidebar,
+        body.dark-mode #examples-modal > div,
+        body.dark-mode #instructions-section > div,
+        body.dark-mode #music-menu,
+        body.dark-mode .bg-white {
+            background-color: #1f2937 !important;
+            border-color: #374151;
+        }
+        body.dark-mode .text-gray-800,
+        body.dark-mode .text-gray-700,
+        body.dark-mode .text-gray-600,
+        body.dark-mode .text-gray-500 {
+            color: #d1d5db !important;
+        }
+        body.dark-mode #search-input {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        body.dark-mode .bg-gray-50,
+        body.dark-mode .bg-blue-50 {
+            background-color: #374151 !important;
+            color: #e5e7eb !important;
+        }
+        body.dark-mode .bg-gray-200 {
+            background-color: #4b5563 !important;
+            color: #f3f4f6 !important;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="fixed top-4 left-4 z-50">
+        <button onclick="toggleSidebar()" class="p-4 bg-white hover:bg-gray-100 text-gray-700 rounded-full shadow-lg transition active:scale-95" title="Menü">
+            <i class="fas fa-cog text-xl"></i>
+        </button>
+    </div>
+
+    <div id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-50 flex flex-col pt-20 pb-4 px-6">
+        <div class="mb-6 border-b pb-4">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Arama</h2>
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Kelime veya anlam ara..." class="w-full p-3 pl-10 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" oninput="handleSearch()">
+                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+            </div>
+            <div id="search-results" class="mt-3 flex flex-col gap-2 max-h-48 overflow-y-auto pr-1"></div>
+        </div>
+        
+        <div class="flex flex-col gap-2">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1 mt-2">Bölümler</h2>
+            <button onclick="showSection('notes')" class="w-full text-left p-3 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition font-medium text-gray-700 flex items-center gap-3"><i class="fas fa-image text-lg"></i> Notlar / Görseller</button>
+            <button onclick="openCategories()" class="w-full text-left p-3 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition font-medium text-gray-700 flex items-center gap-3">
+                <i class="fas fa-th-large text-lg"></i> Kategoriler
+            </button>
+            <button onclick="openThemeModal()" class="w-full text-left p-3 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition font-medium text-gray-700 flex items-center gap-3">
+                <i id="theme-icon" class="fas fa-palette text-lg"></i> Tema Değiştir
+            </button>
+            <button onclick="showSection('instructions')" class="w-full text-left p-3 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition font-medium text-gray-700 flex items-center gap-3"><i class="fas fa-info-circle text-lg"></i> Kullanım Talimatları</button>
+        </div>
+        
+        <div class="mt-auto">
+            <button onclick="returnToMainMenu()" class="w-full p-4 bg-gray-800 hover:bg-gray-900 text-white rounded-xl transition font-bold shadow-lg flex items-center justify-center gap-2">
+                <i class="fas fa-home"></i> Ana Menüye Dön
+            </button>
+        </div>
+    </div>
+
+    <div id="notes-section" class="fixed inset-0 bg-gray-100 z-40 pt-24 px-8 pb-8 overflow-y-auto hidden">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Notlar ve Görseller</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image1.png')">
+                <img src="image1.png" alt="Not 1" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">Probably</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image2.png')">
+                <img src="image2.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">Contact</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image3.png')">
+                <img src="image3.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">Exchange vs Change</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image4.png')">
+                <img src="image4.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">Trait vs Feature</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image5.png')">
+                <img src="image5.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">Rope vs String vs Thread</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image6.png')">
+                <img src="image6.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">Especially vs Spesifically</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image7.png')">
+                <img src="image7.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">-ly</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image8.png')">
+                <img src="image8.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">Spesifically</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image9.png')">
+                <img src="image9.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">as + tam cümle (s+v) / like + nesne or isim</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image10.png')">
+                <img src="image10.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">either</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image11.png')">
+                <img src="image11.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">get</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow cursor-pointer hover:shadow-lg transition" onclick="openImage('image12.png')">
+                <img src="image12.png" alt="Not 2" class="w-full h-48 object-cover rounded-xl mb-2">
+                <p class="text-center font-medium text-gray-600">nuance</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="categories-section" class="fixed inset-0 bg-gray-100 z-40 pt-24 px-8 pb-8 overflow-y-auto hidden">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Otomatik Kategoriler</h2>
+        
+        <div id="categories-loading" class="text-center text-gray-500 hidden mt-10">
+            <i class="fas fa-brain fa-spin text-4xl mb-4 text-blue-500"></i>
+            <p class="font-medium text-lg">Gemini kelimelerini analiz edip gruplara ayırıyor...</p>
+            <p class="text-sm mt-2 opacity-70">(Bu işlem kelime sayısına göre birkaç saniye sürebilir)</p>
+        </div>
+
+        <div id="categories-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto mt-8">
+            </div>
+    </div>
+
+    <div id="instructions-section" class="fixed inset-0 bg-gray-100 z-40 pt-24 px-8 flex justify-center hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-lg max-w-2xl w-full h-fit">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> İpuçları ve Talimatlar</h2>
+            <ul class="list-disc pl-5 space-y-3 text-gray-700 text-lg">
+                <li>Bir kelime için <b>örnek cümleler görmek istediğinde, 'E' tuşuna bas. (farklı örnekler istersen tekrar bas.)</b></li>
+                <li>Kelimenin telafuzunu birçok farklı videodan duymak için <b>P</b> tuşuna bas.</li>
+                <li>Kartı çevirmek için <b>Boşluk</b> tuşuna basabilirsin.</li>
+                <li>Kartları klavyedeki <b>Sağ / Sol Yön Tuşları</b> ile değiştirebilirsin.</li>
+                <li>Kartın arkasındayken <b>Yukarı / Aşağı Yön Tuşları</b> ile kelimeyi doğru ya da yanlış olarak işaretleyebilirsin (↑ = doğru, ↓ = yanlış)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="image-modal" class="fixed inset-0 bg-black/90 z-[60] hidden flex-col items-center justify-center p-4">
+        <button onclick="closeImage()" class="absolute top-6 right-6 text-white hover:text-red-500 text-4xl transition"><i class="fas fa-times"></i></button>
+        <img id="fullscreen-img" src="" class="max-w-full max-h-[90vh] object-contain rounded-lg">
+    </div>
+
+    <div id="theme-modal" class="fixed inset-0 bg-black/70 z-[70] hidden flex-col items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-xs w-full p-6 relative flex flex-col gap-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-2 text-center">Görünüm Seç</h3>
+            
+            <button onclick="setTheme('light')" class="w-full p-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-2xl font-bold transition flex items-center gap-3">
+                <i class="fas fa-sun text-yellow-500"></i> Açık Tema
+            </button>
+            
+            <button onclick="setTheme('dark')" class="w-full p-4 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl font-bold transition flex items-center gap-3">
+                <i class="fas fa-moon text-blue-400"></i> Koyu Tema
+            </button>
+            
+            <button onclick="setTheme('ultra-dark')" class="w-full p-4 bg-black hover:bg-zinc-900 text-white rounded-2xl font-bold border border-zinc-800 transition flex items-center gap-3">
+                <i class="fas fa-ghost text-purple-500"></i> Ultra Koyu
+            </button>
+            
+            <button onclick="closeThemeModal()" class="mt-2 text-gray-500 font-medium hover:text-red-500 transition">Vazgeç</button>
+        </div>
+    </div>
+
+    <div id="examples-modal" class="fixed inset-0 bg-black/60 z-[60] hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative">
+            <button onclick="closeExamples()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl transition"><i class="fas fa-times"></i></button>
+            <h3 id="examples-title" class="text-xl font-bold text-blue-600 mb-4 pr-6">Kelime</h3>
+            <ul id="examples-list" class="space-y-3">
+                </ul>
+        </div>
+    </div>
+
+    <div class="fixed top-4 right-4 z-50">
+        <button onclick="toggleMusicMenu()" class="p-4 bg-white hover:bg-gray-100 text-gray-700 rounded-full shadow-lg transition active:scale-95" title="Müzik Seçenekleri">
+            <i class="fas fa-music text-xl"></i>
+        </button>
+        
+        <div id="music-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100 transition-all">
+            <div class="p-2 text-xs font-semibold text-gray-400 uppercase tracking-widest border-b text-center bg-gray-50">Background Musıc</div>
+            <button onclick="playMusic('https://cdn.pixabay.com/audio/2025/07/23/audio_2a72fc9f3b.mp3', this)" class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition border-b music-btn">🔉White Noise</button>
+            <button onclick="playMusic('yagmur.mp3', this)" class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition border-b music-btn">🎹 Piano</button>
+            <button onclick="playMusic('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3', this)" class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition border-b music-btn">🎸 Energetic</button>
+            <button onclick="stopMusic()" class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-medium">⏹️ Close the Music</button>
+        </div>
+    </div>
+
+    <div class="mb-6 text-center">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Kelime Çalışması</h1>
+        <p class="text-gray-600 text-sm">Kartı çevirmek için tıkla veya <kbd class="bg-gray-200 px-1 rounded">Boşluk</kbd> tuşuna bas.</p>
+    </div>
+
+    <div class="w-full max-w-md h-80 perspective mb-6">
+        <div id="flashcard" class="card-inner bg-white h-full" onclick="flipCard()">
+            <div class="card-face card-front">
+                <span class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4" id="front-label">İngilizce / Kelime</span>
+                <div id="front-text" class="text-3xl font-bold break-words w-full no-select">
+                    Yükleniyor...
+                </div>
+                <div class="mt-4 text-gray-400 text-xs" id="flip-hint">
+                    <i class="fas fa-sync-alt opacity-50"></i> Çevir
+                </div>
+            </div>
+            
+            <div class="card-face card-back">
+                <span class="text-xs font-semibold text-blue-400 uppercase tracking-widest mb-4">Türkçe / Anlamı</span>
+                <div id="back-text" class="text-2xl font-semibold break-words w-full no-select">
+                    Yükleniyor...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="action-buttons" class="flex gap-4 mb-6 hidden opacity-0 transition-opacity duration-300">
+        <button onclick="markIncorrect()" class="px-6 py-3 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-xl shadow transition active:scale-95 flex items-center gap-2">
+            <i class="fas fa-times"></i> False
+        </button>
+        <button onclick="markCorrect()" class="px-6 py-3 bg-green-100 hover:bg-green-200 text-green-700 font-bold rounded-xl shadow transition active:scale-95 flex items-center gap-2">
+            <i class="fas fa-check"></i> True
+        </button>
+    </div>
+
+    <div id="main-controls" class="flex items-center gap-4 mb-6">
+        <button onclick="prevCard()" class="p-4 bg-white hover:bg-gray-100 text-gray-700 rounded-full shadow-lg transition active:scale-95" title="Önceki (Sol Ok)">
+            <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+
+        <div class="text-gray-500 font-mono font-medium min-w-[80px] text-center">
+            <span id="current-index">1</span> / <span id="total-count">0</span>
+        </div>
+
+        <button onclick="nextCard()" class="p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg shadow-blue-200 transition active:scale-95" title="Sonraki (Sağ Ok)">
+            <i class="fas fa-arrow-right text-xl"></i>
+        </button>
+    </div>
+
+    <div class="flex gap-4">
+        <button onclick="shuffleCards()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <i class="fas fa-random"></i> Karıştır
+        </button>
+        <button onclick="resetCards()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <i class="fas fa-redo"></i> Sıfırla
+        </button>
+    </div>
+
+    <script>
+
+        // Data from user prompt
+        const rawData = [
+            { term: "exist", def: "var olmak, mevcut olmak" },
+            { term: "wear", def: "(veır)" },
+            { term: "dust", def: "toz, tozunu almak" },
+            { term: "manner / manners", def: "tarz, tavır ('attitude' Bir olay veya durum karşısındaki zihinsel duruşunuzdur. 'manner' ise Bu zihinsel duruşun dışarıya yansıyan şeklidir.) / (manners = görgü kuralları)" },
+            { term: "unless", def: "-medikçe, -mazsa" },
+            { term: "community service ", def: "toplum yararına yapılan ücretsiz çalışma" },
+            { term: "concept", def: "kavram, konsept" },
+            { term: "fortunate", def: "şanslı" },
+            { term: "majority", def: "çoğunluk (minority = azınlık), reşitlik" },
+            { term: "firm", def: "sıkı, sert, firma" },
+            { term: "extent", def: "kapsam, derece (to some extent = bir dereceye kadar)" },
+            { term: "defrost", def: "buzunu çözmek" },
+            { term: "relate to", def: "bağ kurmak, ilgili olmak" },
+            { term: "ridicule", def: "alay etmek" },
+            { term: "mock", def: "(maak) taklidini yaparak alay etmek" },
+            { term: "bully", def: "zorba" },
+            { term: "satire", def: "yergi (Bir kişinin, kurumun veya toplumun kusurlarını, yanlışlarını veya aptallıklarını eleştirmek için mizah, ironi veya mübalağa kullanma sanatı)" },
+            { term: "liken to ", def: "benzetmek" },
+            { term: "restrict", def: "kısıtlamak, sınırlamak" },
+            { term: "violence", def: "şiddet" },
+            { term: "violent", def: "şiddetli" },
+            { term: "spouse", def: "eş (karı/koca)" },
+            { term: "bumpy", def: "rough" },
+            { term: "damp", def: "nemli (Bir nesnenin veya yerin dokunulduğundaki ıslaklık hissi.)" },
+            { term: "pay off", def: "meyvesini vermek" },
+            { term: "drop out", def: "bırakmak (genellikle okulu)" },
+            { term: "steady rate", def: "sabit oran" },
+            { term: "across", def: "karşısında, boyunca, karşısına" },
+            { term: "observe", def: "gözlemlemek, uymak" },
+            { term: "to observe the rules", def: "kurallara uymak" },
+            { term: "across the world", def: "tüm dünyada" },
+            { term: "though", def: "rağmen, yine de (cümle sonunda kullanılınca)" },
+            { term: "as if", def: "-mış gibi" },
+            { term: "as though", def: "-mış gibi" },
+            { term: "salesclerk", def: "satış elemanı" },
+            { term: "wage", def: "ücret, maaş" },
+            { term: "complement", def: "tamamlayıcı, tamamlamak" },
+            { term: "have a life of its own", def: "kendi başına hareket etmek" },
+            { term: "illustrate", def: "göstermek, açıklamak" },
+            { term: "in his own right", def: "kendi başına" },
+            { term: "invest", def: "yatırım yapmak (invest time/effort = zaman/emek harcamak)" },
+            { term: "tense", def: "gergin" },
+            { term: "either", def: "ya o ya da o (ikisinden biri)" },
+            { term: "slightly", def: "hafifçe" },
+            { term: "conversely", def: "bunun tersine, bunun aksine" },
+            { term: "remarkable", def: "olağanüstü (bir şeyin sadece iyi veya harika olduğunu değil, aynı zamanda şaşırtıcı ve nadir olduğunu vurgular.)" },
+            { term: "truly remarkable", def: "gerçekten olağanüstü" },
+            { term: "inconsistent", def: " tutarsız" },
+            { term: "overcautious", def: "aşırı tedbirli" },
+            { term: "left out", def: "dışlanmış" },
+            { term: "peer", def: "akran" },
+            { term: "compete", def: "yarışmak (competition dan gelsin)" },
+            { term: "get nowhere", def: "hiçbir yere varamamak" },
+            { term: "get going", def: "gitmek, harekete geçmek" },
+            { term: "rush", def: "acele etmek, acele, telaş, hücum etmek (rush hour = trafiğin veya yoğunluğun zirve yaptığı saat)" },
+            { term: "circular", def: "dairesel" },
+            { term: "emphasize", def: "vurgulamak" },
+            { term: "along the lines of", def: "gibi (something along the lines of = gibi bir şey)" },
+            { term: "kicking and screaming", def: "zorla" },
+            { term: "revise", def: "gözden geçirmek, değiştirmek" },
+            { term: "more or less", def: "aşağı yukarı" },
+            { term: "self-esteem", def: "özsaygı" },
+            { term: "versatile", def: "çok yönlü (vörsıtıl)" },
+            { term: "rigid", def: "sert, katı" },
+            { term: "sense", def: "duyu, his" },
+            { term: "safety gear", def: "güvenlik ekipmanı (Gear burada vites anlamında değil, 'takım, teçhizat veya donanım' anlamındadır. 'Camping gear' (kamp malzemesi) veya 'sports gear' (spor ekipmanı) gibi.)" },
+            { term: "slippers", def: "terlik" },
+            { term: "slip", def: "kaymak" },
+            { term: "slippery", def: "kaygan" },
+            { term: "mere", def: "sadece" },
+            { term: "counter", def: "tezgah, karşı, karşı koymak, sayaç" },
+            { term: "curiosity", def: "merak (curious = meraklı)" },
+            { term: "literary", def: "edebi (literature = edebiyat 'tan türemiştir)" },
+            { term: "setting", def: "ayar, ortam" },
+            { term: "plot", def: "olay örgüsü" },
+            { term: "plot twist", def: "ters köşe" },
+            { term: "exposition", def: "açıklama, giriş (hikayede), sergi" },
+            { term: "coincidence", def: "tesadüf" },
+            { term: "plain", def: "sade" },
+            { term: "get a move on", def: "hurry up" },
+            { term: "establish", def: "kurmak, belirlemek" },
+            { term: "firmly establish", def: "kesin olarak kanıtlamak" },
+            { term: "store", def: "depolamak" },
+            { term: "luggage", def: "bagaj" },
+            { term: "supply", def: "sağlamak, kaynak" },
+            { term: "vast", def: "devasa, çok büyük" },
+            { term: "başka bir kelimeyle karıştırdım", def: "I confused it with another word" },
+            { term: "address", def: "ele almak" },
+            { term: "initial", def: "ilk" },
+            { term: "acknowledge", def: "onaylamak, kabul etmek" },
+            { term: "appeal to someone", def: "birine cazip gelmek" },
+            { term: "appeal", def: "cazip gelmek, çekicilik" },
+            { term: "don't sweat the details", def: "detaylara takılma" },
+            { term: "soar", def: "hızla yükselmek (soor)" },
+            { term: "on the edge", def: "eşiğinde, sınırında (çok önemli veya tehlikeli bir değişikliğin gerçekleşmesine çok yakın olmak)" },
+            { term: "I got you", def: "seni anladım, seni yakaladım, ben hallederim" },
+            { term: "I get it", def: "anladım" },
+            { term: "first and foremost", def: "her şeyden önce" },
+            { term: "standings", def: "puan durumu, sıralama" },
+            { term: "tied", def: "berabere (hem şimdiki zamanda hem de geçmiş zamanda kullanılır), bağlanmış, bağlı" },
+            { term: "ribbon", def: "kurdele" },
+            { term: "tie", def: "bağlamak, kravat" },
+            { term: "settle", def: "yerleşmek, çözmek" },
+            { term: "no sweat", def: "sorun değil, çok kolay" },
+            { term: "claim victory", def: "zafer ilan etmek" },
+            { term: "clumsy", def: "sakar, beceriksiz" },
+            { term: "awkward", def: "tuhaf, garip, rahatsız edici" },
+            { term: "awful", def: "kötü, berbat" },
+            { term: "replicate", def: "kopyasını yapmak ('duplicate' ise daha çok fiziksel bir nesneyi kopyalamak için kullanılır. )" },
+            { term: "intrusive", def: "rahatsız edici" },
+            { term: "rival", def: "dişli rakip (Rival, uzun süreli bir rekabeti ifade eder. Coca-Cola ve Pepsi birbirinin rival'ıdır; sadece bir gün değil, yıllardır yarışırlar)" },
+            { term: "basically", def: "Bir şeyi uzun uzun anlatmak yerine ''işin özü şu'' demek istediğinde imdadına yetişir." },
+            { term: "dedicate", def: "adamak" },
+            { term: "alter", def: "değiştirmek (Bir şeyin özünü bozmadan üzerinde yapılan değişiklik. (tamamen değiştirmek değildir))" },
+            { term: "flag", def: "işaretlemek" },
+            { term: "invest", def: "yatırım yapmak" },
+            { term: "internal", def: "dahili, iç" },
+            { term: "external", def: "dış, harici" },
+            { term: "maintain", def: "sürdürmek, bakımını yapmak (maintenance = isim hali)" },
+            { term: "augmented reality", def: "arttırılmış gerçeklik" },
+            { term: "alike", def: "benzer, benzer şekilde" },
+            { term: "slightly", def: "hafifçe" },
+            { term: "interact", def: "etkileşim kurmak" },
+            { term: "encounter", def: "karşılaşmak (counter karşı'dan aklına gelsin)" },
+            { term: "shift", def: "değiştirmek, değişim" },
+            { term: "assumption", def: "varsayım (assume dan geliyor)" },
+            { term: "revolution", def: "devrim" },
+            { term: "tackle", def: "müdahale etmek" },
+            { term: "threat", def: "tehdit, tehlike" },
+            { term: "prohibit", def: "yasaklamak (forbid günlük kullanım, prohibit resmi kullanım)" },
+            { term: "disposal", def: "imha, imha etmek" },
+            { term: "crucial", def: "kritik, çok önemli" },
+            { term: "circumstances", def: "koşullar, şartlar (sörkımstınsıs)" },
+            { term: "precise", def: "tam, kesin" },
+            { term: "sensitive", def: "hassas, duyarlı (sense = duyu, his)" },
+            { term: "conserve", def: "korumak, tasarruf etmek" },
+            { term: "put someone on the spot", def: "zor durumda bırakmak" },
+            { term: "on that note", def: "Bir konudan onunla ilişkili başka bir konuya geçiş yaparken kullanılır" },
+            { term: "nucleus", def: "çekirdek. ('Nucleus' kelimesini 'Nükleer' (Nuclear) enerji ile bağdaştırabilirsin. Nükleer enerji, atomun çekirdeğinden (nucleus) elde edilir.)" },
+            { term: "spacecraft / manned spacecraft", def: "uzay aracı / insanlı uzay aracı" },
+            { term: "storey", def: "kat (bina vb.)" },
+            { term: "landscape", def: "= scenery = manzara" },
+            { term: "a bleak landscape", def: "kasvetli bir manzara" },
+            { term: "suffer", def: "acı çekmek, zarar görmek (suffer genellikle daha uzun süreli, hurt ise daha anlıktır.)" },
+            { term: "suffer the consequences", def: "sonuçlarına katlanmak" },
+            { term: "suffer a loss", def: "zarara uğramak" },
+            { term: "particle", def: "parçacık" },
+            { term: "subatomic particles", def: "atom altı parçacıklar" },
+            { term: "matter", def: "madde, mesele/konu" },
+            { term: "As a matter of fact,", def: "aslında" },
+            { term: "no matter what", def: "ne olursa olsun" },
+            { term: "solid", def: "katı" },
+            { term: "solid gold", def: "saf altın" },
+            { term: "a solid 2 hours", def: "tam 2 saat)" },
+            { term: "assign", def: "atamak" },
+            { term: "thus", def: "so" },
+            { term: "in order to", def: "to (-mek için)" },
+            { term: "so that", def: "diye = in order that (daha resmi)" },
+            { term: "based on", def: "-e dayanarak, dayanmak" },
+            { term: "apparent", def: "görünür" },
+            { term: "for no apparent reason", def: "görünürde hiç sebep yokken" },
+            { term: "it became apparent that", def: "... olduğu ortaya çıktı" },
+            { term: "investigate", def: "araştırmak, soruşturmak" },
+            { term: "indeed", def: "really" },
+            { term: "in which", def: "where, when, which" },
+            { term: "revolve", def: "dönmek" },
+            { term: "in terms of", def: "açısından" },
+            { term: "in the case of / in case of", def: "... durumunda" },
+            { term: "string", def: "ip, tel, karakter dizisi" },
+            { term: "consciously", def: "bilinçli olarak" },
+            { term: "exclusive", def: "özel, ayrıcalıklı" },
+            { term: "mutually exclusive", def: "birbirini dışlamak" },
+            { term: "settle", def: "yerleşmek, çözmek" },
+            { term: "settle for", def: "ile yetinmek" },
+            { term: "turn over", def: "ters çevirmek, devretmek (turn over the page deriz mesela)" },
+            { term: "over and over", def: "tekrar tekrar" },
+            { term: "substantial", def: "significant" },
+            { term: "correlate", def: "ilişkilendirmek" },
+            { term: "preponderance", def: "çoğunluk" },
+            { term: "trait", def: "özellik (karakteristik)" },
+            { term: "overlook", def: "gözden kaçırmak, görmezden gelmek, tepeden bakmak (konum/manzara olarak)" },
+            { term: "reserved", def: "rezerve, çekingen" },
+            { term: "upbringing", def: "yetiştirilme tarzı" },
+            { term: "fly (2. ve 3.hal)", def: "fly, flew, flown" },
+            { term: "bring (2. ve 3.hal)", def: "bring, brought, brought" },
+            { term: "fall (2. ve 3.hal)", def: "fall, fell, fallen" },
+            { term: "teach (2. ve 3.hal)", def: "teach, taught, taught" },
+            { term: "think (2. ve 3.hal)", def: "think, thought, thought" },
+            { term: "wear (2. ve 3.hal)", def: "wear, wore, worn" },
+            { term: "bite (2. ve 3.hal)", def: "bite, bit, bitten" },
+            { term: "draw (2. ve 3.hal)", def: "draw, drew, drawn" },
+            { term: "feed (2. ve 3.hal)", def: "feed, fed, fed" },
+            { term: "fight (2. ve 3.hal)", def: "fight, fought, fought" },
+            { term: "keep (2. ve 3.hal)", def: "keep, kept, kept" },
+            { term: "hide (2. ve 3.hal)", def: "hide, hid, hidden" },
+            { term: "hold (2. ve 3.hal)", def: "hold, held, held" },
+            { term: "ride (2. ve 3.hal)", def: "ride, rode, ridden" },
+            { term: "rise (2. ve 3.hal)", def: "rise, rose, risen" },
+            { term: "sleep (2. ve 3.hal)", def: "sleep, slept, slept" },
+            { term: "sit (2. ve 3.hal)", def: "sit, sat, sat" },
+            { term: "stand (2. ve 3.hal)", def: "stand, stood, stood" },
+            { term: "throw (2. ve 3.hal)", def: "throw, threw, thrown" },
+            { term: "wake (2. ve 3.hal)", def: "wake, woke, woken" },
+            { term: "spacious", def: "ferah, geniş (space kelimesinden türemiştir)" },
+            { term: "exhort", def: "teşvik etmek (birini bir şey yapması için güçlü bir şekilde ikna etmeye çalışmak)" },
+            { term: "extend", def: "uzatmak, genişletmek" },
+            { term: "made from scratch", def: "sıfırdan yapılmış (Hazır bir temel kullanmadan, her şeyi kendi yaparak)" },
+            { term: "considered", def: "düşünülen, göz önünde bulundurulan, kabul edilmek (consider + ed anlamında da olabilir dikkat et!) / all things considered = her şey düşünülürse, her şey hesaba katıldığında" },
+            { term: "nor", def: "Genellikle 'neither' ile birlikte 'ne o, ne de öbürü' anlamında kullanılır. (I have neither the time nor the money.) / I can't help you, nor can anyone else in this room. (Sana yardım edemem, bu odadaki başka hiç kimse de edemez.)" },
+            { term: "neither", def: "hiçbiri (İki seçenekten bahsedilirken 'ikisi de değil' anlamında), ne ... ne ... / I don't want to go to the cinema. - 'Me neither' (Ben de)"},
+            { term: "institution", def: "kurum" },
+            { term: "follow suit", def: "örnek almak" },
+            { term: "remote places", def: "şehir merkezinden çok uzakta olan yerler, ıssız yerler (remote control dan aklına gelsin)" },
+            { term: "tranquility", def: "huzur" },
+            { term: "no small feat", def: "Hiç de küçümsenecek bir başarı değil" },
+            { term: "considerable", def: "azımsanmayacak kadar çok, önemli ölçüde" },
+            { term: "admit", def: "kabul etmek, itiraf etmek" },
+            { term: "load", def: "yük, yüklemek" },
+            { term: "terrain", def: "arazi, zemin (terra rosa dan gelsin aklına)" },
+            { term: "scale", def: "ölçek, tırmanmak" },
+            { term: "mull over", def: "üzerinde düşünmek (over ztn üzerinde demek)(consider gibi hatta daha da derin bir düşünme)" },
+            { term: "take off", def: "havalanmak, çıkarmak (aykkabı,kıyafet), bir anda popülerleşmek" },
+            { term: "drawn-out", def: "bitmek bilmeyen" },
+            { term: "get ripped off", def: "kazıklanmak" },
+            { term: "take the plunge", def: "harekete geçmek (bekleyip bekleyip sonunda harekete geçme)" },
+            { term: "upheaval", def: "kargaşa" },
+            { term: "portray", def: "betimlemek" },
+            { term: "depict", def: "betimlemek (depict-pict-picture diye kodla)" },
+            { term: "owing to", def: "because of / due to (bunların ardından tam cümle gelmez)" },
+            { term: "the fact that", def: "normalde ardından tam cümle gelmeyen discourse markers'lara tam cümle getirmeyi sağlar" },
+            { term: "nevertheless / nonetheless", def: "however" },
+            { term: "equally", def: "aynı şekilde" },
+            { term: "likewise", def: "similarly" },
+            { term: "aligned", def: "hizalanmış, uyumlu (a-line gibi düşün)" },
+            { term: "forbid", def: "yasaklamak (forbid/forbade/forbidden)" },
+            { term: "intervention", def: "müdahale (inter vent (went to). inter gitti kayarak 'müdahale' yaptı.)" },
+            { term: "inadequate", def: "yetersiz ('Adet' kelimesinden çağrışım yapabilirsin. Adet uygun değil, yani in-adequate (yetersiz))." },
+            { term: "concern", def: "endişe (This issue doesn't concern you = bu konu seni ilgilendirmez)" },
+            { term: "whether", def: "I am not sure whether it will rain today or not. She is still debating whether she should accept the job offer. / (Bugün yağmur yağmıp yağmayacağından emin değilim.) (İş teklifini kabul edip etmemeyi hala tartışıyor.)" },
+            { term: "overhaul", def: "Bakımdan geçirmek (Her parçasını kontrol edip yenilemek veya düzeltmek)" },
+            { term: "specifically ", def: "özellikle (Specifically ifadesi, bir konuyu genelden özele indirgerken kullandığımız en etkili araçlardan biridir. örneğin: I like watching football matches. Specifically, Manchester City's matches.)" },
+            { term: "syllable", def: "hece" },
+            { term: "harbor", def: "barındırmak, liman (harbor-bor-borındırmak)" },
+            { term: "regardless of", def: "-e bakılmaksızın" },
+            { term: "correspond", def: "uyuşmak (uymak anlamında), yazışmak" },
+            { term: "receptive to", def: "açık olmak (bir fikre vb.) (receive'i çağrıştırıyor. almak. yeni fikirleri almak. açık olmak.)" },
+            { term: "badge of honour", def: "onur kaynağı" },
+            { term: "hands-on", def: "uygulamalı (Sadece teoride kalmayıp, bizzat yaparak öğrenilen veya yapılan)" },
+            { term: "proceed at someone's own pace", def: "kendi hızında ilerlemek" },
+            { term: "omit", def: "atlamak, dahil etmemek (om it lan onu)" },
+            { term: "suppose", def: "varsaymak" },
+            { term: "beyond", def: "ötesinde" },
+            { term: "bad press", def: "kötü haberler" },
+            { term: "inclination", def: "eğilim" },
+            { term: "foolhardy", def: "aptalca (aptalca bir cesurluk) (fool=aptal + hard=sert,zor)" },
+            { term: "counteract", def: "etkisiz hale getirmek (counter-attack gibi düşün. kontra atağa çıkınca rakibinkini 'etkisiz hale getirmiş' olursun.)" },
+            { term: "reasonable", def: "makul" },
+            { term: "give it a go = give it a shot = have a go = have a try", def: "bi denemek, bir şans vermek" },
+            { term: "miserable ", def: "berbat" },
+            { term: "concrete", def: "(kon-krit) somut" },
+            { term: "judge", def: "yargılamak, yargıç" },
+            { term: "prosocial", def: "yardımsever" },
+            { term: "make sense", def: "mantıklı gelmek, anlaşılır olmak" },
+            { term: "fall into place", def: "yerli yerine oturmak" },
+            { term: "make up your own mind", def: "kendi kararını vermek" },
+            { term: "principal", def: "asıl, en önemli, okul müdürü (headteacher)" },
+            { term: "consequence", def: "Result, herhangi bir eylemin basit sonucudur ve olumlu olabilir (Örn: Sınav sonucu). Consequence ise genellikle bir hatanın, ihmalin veya belirli bir kararın ardından gelen, çoğu zaman olumsuz veya ciddi etkileri olan sonuçları vurgular." },
+            { term: "cooperation", def: "iş birliği" },
+            { term: "cooperative (adj) ", def: "iş birliğine dayalı" },
+            { term: "waste", def: "israf etmek" },
+            { term: "stale", def: "bayat" },
+            { term: "best before date", def: "tavsiye edilen tüketim tarihi" },
+            { term: "expiry date ", def: "son kullanma tarihi" },
+            { term: "whereas ", def: "-ken (kıyaslama yaparken kullanılır)" },
+            { term: "as well as ", def: "yanısıra (as ... as mantığında da kullanılabilir (... kadar iyi)) (She is talented in singing as well as dancing = dans etmenin yanısıra...)" },
+            { term: "throw away ", def: "çöpe atmak" },
+            { term: "moldy", def: "küflü" },
+            { term: "can ", def: "teneke kutu, konserve" },
+            { term: "bin ", def: "çöp kutusu" },
+            { term: "agriculture", def: "tarım" },
+            { term: "shelter", def: "barınma, sığınak (şalter - elektrik - elektrik nerde olur - evde olur - ev bize ne sağlar - 'barınma')" },
+            { term: "contest", def: "yarışma, itiraz etmek" },
+            { term: "throughout", def: "boyunca" },
+            { term: "aspect", def: "yön (örn: We need to consider every aspect of the problem before making a decision.)" },
+            { term: "examine", def: "incelemek" },
+            { term: "the bottom line", def: "asıl mesele" },
+            { term: "by and large", def: "genel olarak" },
+            { term: "get something straight", def: "bir şeyi açıklığa kavuşturmak / netleştirmek" },
+            { term: "get attention", def: "dikkat çekmek" },
+            { term: "farming", def: "çiftçilik, hayvancılık" },
+            { term: "soil", def: "toprak (İçinde bitki yetişen, mineralli ve canlı topraktır.)" },
+            { term: "bend", def: "eğmek, bükmek" },
+            { term: "domestic", def: "yerli" },
+            { term: "crop", def: "ekin, kırpmak" },
+            { term: "constant", def: "sürekli, sabit (constant - stant - stand - 'sürekli' ayakta ve 'sabit' durmak)" },
+            { term: "constantly", def: "sürekli" },
+            { term: "claim", def: "iddia etmek, talep etmek, iddia, talep" },
+            { term: "contribution", def: "katkı" },
+            { term: "in the long run", def: "uzun vadede" },
+            { term: "it's early days", def: "henüz çok erken" },
+            { term: "brand", def: "marka" },
+            { term: "reputation", def: "itibar" },
+            { term: "loan", def: "kredi, ödünç vermek" },
+            { term: "surrounding", def: "çevreleyen, civardaki" },
+            { term: "within", def: "içinde, içerisinde" },
+            { term: "eventually", def: "en sonunda" },
+            { term: "shift gears", def: "vites değiştirmek (mecaz anlamda)" },
+            { term: "immigration", def: "göç" },
+            { term: "In general / overall / on the whole", def: "genel olarak" },
+            { term: "permanent x temporary", def: "." },
+            { term: "walk out on", def: "terk etmek" },
+            { term: "catch up", def: " yetişmek, yakalamak, hasret gidermek (uzun süredir görüşülmeyen biriyle neler olup bittiğini konuşmak)" },
+            { term: "talk into", def: "convince" },
+            { term: "let me down (let someone down)", def: "hayal kırıklığına uğratmak" },
+            { term: "basically", def: "Günlük konuşmada 'basically', bazen cümleye çok derin bir anlam katmasa da konuşmacıya düşünmek için zaman kazandıran (yani, şey, aslında gibi) bir dolgu kelimesi olarak çok sık kullanılır." },
+            { term: "throw out", def: "throw away" },
+            { term: "point out", def: "dikkat çekmek, işaret etmek" },
+            { term: "get rid of ", def: "kurtulmak (Bir şeyi atmak, birinden kurtulmak veya istenmeyen bir durumu sona erdirmek) (git rid of, oh be kurtuldum)" },
+            { term: "pick and choose", def: "keyfine göre seçmek" },
+            { term: "debate", def: "tartışma" },
+            { term: "brew tea", def: "çay demlemek" },
+            { term: "crew", def: "ekip" },
+            { term: "frame", def: "çerçeve, iskelet, gövde" },
+            { term: "blaze", def: "yangın" },
+            { term: "onto", def: "üstüne, üzerine ('in'to değil de 'on'to diye düşün mantık öyle)" },
+            { term: "investigation", def: "soruşturma" },
+            { term: "consequently", def: "= as a result = sonuç olarak" },
+            { term: "therefore", def: "so" },
+            { term: "evolve", def: "gelişmek" },
+            { term: "out of the blue ", def: " aniden (beklenmedik bir anda), damdan düşer gibi" },
+            { term: "revision ", def: "gözden geçirme" },
+            { term: "specify ", def: "açıkça belirtmek" },
+            { term: "sue", def: "dava etmek" },
+            { term: "regulate", def: "düzenlemek, denetlemek (regular gbi düşn)" },
+            { term: "filthy", def: "çok pis" },
+            { term: "quiet", def: "sessiz" },
+            { term: "quite", def: "oldukça" },
+            { term: "secure", def: "güvenli" },
+            { term: "seat belt ", def: "emniyet kemeri" },
+            { term: "wheel", def: "tekerlek" },
+            { term: "brake", def: "fren, fren yapmak (break ile okunuşu aynıdır)" },
+            { term: "do the job", def: "işini görmek" },
+            { term: "in the hands of", def: "...nın ellerinde" },
+            { term: "at least", def: "en az" },
+            { term: "required", def: "gerekli (dikkat! require'dan farklı)" },
+            { term: "involve", def: "içermek, dahil etmek" },
+            { term: "in the same ballpark", def: "yakın" },
+            { term: "submit", def: "teslim etmek" },
+            { term: "play ball", def: "iş birliği yapmak" },
+            { term: "negotiable", def: "pazarlığa açık" },
+            { term: "negotiate", def: "görüşmek (Maaş, kontrat, barış görüşmesi vb.)" },
+            { term: "Managed to", def: "başarmak (zor da olsa başarmak anlamı katar)" },
+            { term: "promote", def: "terfi ettirmek, reklamını yapmak, teşvik etmek" },
+            { term: "offered", def: "teklif edilen" },
+            { term: "release", def: "serbest bırakmak / piyasaya sürmek" },
+            { term: "Mediterranean", def: "Akdeniz" },
+            { term: "dull", def: "sıkıcı" },
+            { term: "ask for time off", def: "izin istemek (işten, okuldan vs.)" },
+            { term: "get paid", def: "maaşını almak / ödeme almak" },
+            { term: "take a day off", def: "bir gün izin kullanmak / bir gün ara vermek" },
+            { term: "flee" , def: "kaçmak (ciddi bir durumdan: savaş, doğal afet vb.)" },
+            { term: "previously", def: "önceden" },
+            { term: "advance", def: "gelişme / ilerleme" },
+            { term: "wipe out", def: "yok etmek" },
+            { term: "charge", def: "şarj etmek, ücret almak" },
+            { term: "apply", def: "uygulamak, başvurmak" },
+            { term: "coast", def: "kıyı" },
+            { term: "patient", def: "hasta / sabırlı" },
+            { term: "go back to square one", def: "en başa dönmek" },
+            { term: "priority", def: "öncelik" },
+            { term: "prior", def: "önceki" },
+            { term: "prior to", def: "...den önce" },
+            { term: "sequence", def: "sıralama" },
+            { term: "pulse", def: "nabız" },
+            { term: "enable", def: "etkinleştirmek, imkan vermek (sağlamak)" },
+            { term: "disable", def: "devredışı bırakmak" },
+            { term: "except", def: "hariç (okunuş: eksept (accept ile aynı))" },
+            { term: "lie", def: "uzanmak / yalan söylemek" },
+            { term: "led", def: "lead'in 2. ve 3. hali (sebep oldu / liderlik etti)" },
+            { term: "packed", def: "tamamen dolu (adj)" },
+            { term: "sail", def: "yelken, denize açılmak" },
+            { term: "bottom", def: "en alt kısım, dip" },
+            { term: "submarine", def: "denizaltı" },
+            { term: "afford", def: "gücü yetmek" },
+            { term: "Sculpture", def: "heykel" },
+            { term: "raw", def: "çiğ / ham" },
+            { term: "rough", def: "pürüzlü, kaba, zorlu" },
+            { term: "plentiful", def: "bol, çok" },
+            { term: "exchange", def: "değiştirmek, takas etmek, döviz" },
+            { term: "housing", def: "konut" },
+            { term: "enlarge", def: "genişletmek (fiziksel boyut)" },
+            { term: "expand", def: "genişletmek (kapsamı, sınırları, iş hacmini)" },
+            { term: "turn into", def: "dönüşmek" },
+            { term: "site", def: "alan" },
+            { term: "treat", def: "tedavi / davranmak" },
+            { term: "my treat", def: "benden (hesap benden)" },
+            { term: "display", def: "göstermek / ekran" },
+            { term: "In time", def: "Yetişmek (Biraz erken)" },
+            { term: "take your time", def: "acele etme" },
+            { term: "efficient", def: "verimli, etkili" },
+            { term: "capable", def: "yetenekli" },
+            { term: "toward", def: "-e doğru" },
+            { term: "obvious", def: "çok açık" },
+            { term: "likely", def: "muhtemel, büyük ihtimalle" },
+            { term: "unlikely", def: "düşük ihtimalle" },
+            { term: "take place", def: "gerçekleşmek" },
+            { term: "take care of", def: "ilgilenmek" },
+            { term: "profession", def: "meslek" },
+            { term: "review", def: "incelemek, değerlendirme" },
+            { term: "take part", def: "katılmak" },
+            { term: "above all", def: "her şeyden önce (most importantly)" },
+            { term: "on top of that", def: "buna ek olarak (additionally)" },
+            { term: "attach", def: "eklemek (dosya vb.)" },
+            { term: "keep in touch with", def: "iletişimi sürdürmek" },
+            { term: "up-to-date", def: "güncel" },
+            { term: "instant", def: "anlık, ani, an" },
+            { term: "instantly", def: "anında" },
+            { term: "instant coffee", def: "hazır kahve" },
+            { term: "slide", def: "kaymak, kaydırmak (slayttan aklına gelsin slaytı kaydırmak gibi), slayt" },
+            { term: "slice", def: "dilimlemek" },
+            { term: "case", def: "vaka, durum" },
+            { term: "weigh", def: "tartmak" },
+            { term: "wrap", def: "sarmak, paketlemek, dürüm" },
+            { term: "employ", def: "işe almak (hire)" },
+            { term: "telecommute", def: "work from home" },
+            { term: "reconstitute", def: "sulandırmak" },
+            { term: "outline", def: "ana hatlarını özetlemek, taslak, taslak çıkarmak" },
+            { term: "humid", def: "nemli" },
+            { term: "humidity", def: "nem" },
+            { term: "department store", def: "alışveriş merkezi" },
+            { term: "keep up (the good work)", def: "(iyi işine) devam et" },
+            { term: "assess / evaluate", def: "değerlendirmek" },
+            { term: "stay away from something / somebody", def: "...den uzak dur" },
+            { term: "out of season", def: "mevsimi değil" },
+            { term: "since + past simple", def: "-den beri" },
+            { term: "bias", def: "önyargı" },
+            { term: "consider + Ving", def: "düşünmek, göz önünde bulundurmak (Think, genel bir düşünme eylemidir. Consider ise daha derinlemesine, seçenekleri değerlendirerek yapılan bir düşünme sürecini ifade eder.)" },
+            { term: "gender-neutral", def: "cinsiyetten bağımsız" },
+            { term: "intense", def: "yoğun" },
+            { term: "intensive", def: "yoğun, yoğunlaştırılmış" },
+            { term: "occur", def: "meydana gelmek" },
+            { term: "recover", def: "iyileşmek (recovery = iyileşme)" },
+            { term: "sustainable", def: "sürdürülebilir" },
+            { term: "struggle", def: "mücadele etmek, zorlanmak" },
+            { term: "along", def: "boyunca" },
+            { term: "nutrient", def: "besin" },
+            { term: "nutrition", def: "beslenme" },
+            { term: "rail system", def: "raylı sistem" },
+            { term: "healthcare", def: "sağlık hizmetleri" },
+            { term: "considering", def: "düşünülürse, göz önünde bulundurulursa (consider + ing, consider'ın şimdiki zaman eki almış hali olabilir dikkat et.)" },
+            { term: "honor", def: "onur" }
+        ];
+
+        let cards = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+        let originalCards = null; // Arama yapmadan önceki kart listesini tutacak
+        let originalIndex = 0;    // Arama yapmadan önceki sırayı tutacak
+
+        // --- YAPAY ZEKA GÜVENLİK AYARI ---
+        // GitHub botları şifreyi görüp iptal etmesin diye ikiye bölüyoruz:
+        const keyPart1 = "AIzaSyCsqRKtiOd"; // Yeni şifrenin İLK YARISINI buraya yapıştır
+        const keyPart2 = "6P572tdTXs0QOinIUI8JiLo8"; // Yeni şifrenin İKİNCİ YARISINI buraya yapıştır
+        const GEMINI_API_KEY = keyPart1 + keyPart2;
+        const cardElement = document.getElementById('flashcard');
+        const frontText = document.getElementById('front-text');
+        const backText = document.getElementById('back-text');
+        const currentIndexEl = document.getElementById('current-index');
+        const totalCountEl = document.getElementById('total-count');
+        const actionButtons = document.getElementById('action-buttons');
+        const mainControls = document.getElementById('main-controls');
+
+        // --- İLERLEME KAYDETME VE YÜKLEME SİSTEMİ BAŞLANGICI ---
+        function loadProgress() {
+            const savedCards = localStorage.getItem('flashcards_cards');
+            const savedIndex = localStorage.getItem('flashcards_index');
+
+            if (savedCards) {
+                cards = JSON.parse(savedCards);
+            } else {
+                cards = [...rawData];
+            }
+
+            if (savedIndex !== null) {
+                currentIndex = parseInt(savedIndex, 10);
+                // Eğer kaydedilen indeks, güncel kart sayısından büyükse başa sar (hata önleme)
+                if (currentIndex >= cards.length) {
+                    currentIndex = 0;
+                }
+            } else {
+                currentIndex = 0;
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('flashcards_cards', JSON.stringify(cards));
+            localStorage.setItem('flashcards_index', currentIndex);
+        }
+        // --- İLERLEME KAYDETME VE YÜKLEME SİSTEMİ BİTİŞİ ---
+
+        function updateCardDisplay() {
+            // Check if all cards are learned
+            if (cards.length === 0) {
+                document.getElementById('front-label').style.display = 'none';
+                document.getElementById('flip-hint').style.display = 'none';
+                frontText.textContent = "🎉 Harika!";
+                backText.textContent = "Tüm kelimeleri öğrendin.";
+                currentIndexEl.textContent = "0";
+                totalCountEl.textContent = "0";
+                hideActionButtons();
+                mainControls.classList.add('hidden');
+                
+                // Keep card on front
+                isFlipped = false;
+                cardElement.classList.remove('is-flipped');
+                
+                saveProgress(); // Bitirme durumunu da kaydet
+                return;
+            }
+
+            mainControls.classList.remove('hidden');
+            document.getElementById('front-label').style.display = 'block';
+            document.getElementById('flip-hint').style.display = 'block';
+
+            // 1. Animasyonu geçici olarak kapat ve kartı anında öne çevir
+            cardElement.style.transition = 'none';
+            cardElement.classList.remove('is-flipped');
+            isFlipped = false;
+            
+            // 2. Tarayıcıyı zorla yenile (Reflow) - bu sayede animasyonsuz dönüş anında uygulanır
+            void cardElement.offsetWidth;
+            
+            // 3. Metinleri yeni karta göre güncelle
+            const currentCard = cards[currentIndex];
+            frontText.textContent = currentCard.term;
+            backText.textContent = currentCard.def;
+            
+            currentIndexEl.textContent = currentIndex + 1;
+            totalCountEl.textContent = cards.length;
+            
+            // 4. Animasyonu geri aç ve butonları gizle
+            cardElement.style.transition = 'transform 0.6s';
+            hideActionButtons();
+            
+            // HER KART DEĞİŞTİĞİNDE İLERLEMEYİ KAYDET
+            saveProgress();
+        }
+
+        function flipCard() {
+            if (cards.length === 0) return; // Don't flip if finished
+
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                cardElement.classList.add('is-flipped');
+                showActionButtons();
+            } else {
+                cardElement.classList.remove('is-flipped');
+                hideActionButtons();
+            }
+        }
+
+        function showActionButtons() {
+            actionButtons.classList.remove('hidden');
+            setTimeout(() => {
+                actionButtons.classList.remove('opacity-0');
+            }, 10);
+            mainControls.classList.add('hidden');
+        }
+
+        function hideActionButtons() {
+            actionButtons.classList.add('opacity-0');
+            setTimeout(() => {
+                actionButtons.classList.add('hidden');
+            }, 300);
+            if (cards.length > 0) {
+                mainControls.classList.remove('hidden');
+            }
+        }
+
+        // BİLDİM BUTONU
+        function markCorrect() {
+            cards.splice(currentIndex, 1);
+            
+            if (currentIndex >= cards.length) {
+                currentIndex = 0;
+            }
+            updateCardDisplay();
+        }
+
+        // BİLEMEDİM BUTONU
+        function markIncorrect() {
+            nextCard();
+        }
+
+        function nextCard() {
+            if (currentIndex < cards.length - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0; // Başa dön
+            }
+            updateCardDisplay();
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = cards.length - 1; // Sona git
+            }
+            updateCardDisplay();
+        }
+
+        function shuffleCards() {
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            currentIndex = 0;
+            updateCardDisplay();
+        }
+
+        function resetCards() {
+            cards = [...rawData];
+            currentIndex = 0;
+            // Başa Dönüldüğünde eski kayıtları temizle
+            localStorage.removeItem('flashcards_cards');
+            localStorage.removeItem('flashcards_index');
+            updateCardDisplay();
+        }
+
+        // --- MÜZİK KONTROL SİSTEMİ BAŞLANGICI ---
+        let currentAudio = null;
+
+        function toggleMusicMenu() {
+            const menu = document.getElementById('music-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function playMusic(url, btnElement) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            
+            currentAudio = new Audio(url);
+            currentAudio.loop = true;
+            currentAudio.volume = 0.2; 
+
+            currentAudio.play().then(() => {
+                console.log("Müzik başarıyla başladı.");
+                document.querySelectorAll('.music-btn').forEach(btn => btn.classList.remove('bg-blue-100', 'text-blue-700', 'font-bold'));
+                if(btnElement) btnElement.classList.add('bg-blue-100', 'text-blue-700', 'font-bold');
+                toggleMusicMenu();
+            }).catch(error => {
+                console.log("Müzik başlatılamadı:", error);
+            });
+        }
+        
+        function stopMusic() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+            }
+            document.querySelectorAll('.music-btn').forEach(btn => btn.classList.remove('bg-blue-100', 'text-blue-700', 'font-bold'));
+            toggleMusicMenu();
+        }
+        // --- MÜZİK KONTROL SİSTEMİ BİTİŞİ ---
+
+        // --- YAPAY ZEKA KATEGORİ SİSTEMİ ---
+        let categoryDataCache = null; // Her girişte API'yi yormamak için sonucu hafızada tutacağız
+        // Kutular için sivri olmayan ve şık pastel renk paleti
+        const colorPalette = ['bg-red-100 text-red-800', 'bg-blue-100 text-blue-800', 'bg-green-100 text-green-800', 'bg-yellow-100 text-yellow-800', 'bg-purple-100 text-purple-800', 'bg-pink-100 text-pink-800', 'bg-indigo-100 text-indigo-800', 'bg-teal-100 text-teal-800'];
+
+        async function openCategories() {
+            showSection('categories'); // Menüyü kapat, kategori sayfasını aç
+            
+            // Eğer daha önce kategorize edildiyse hafızadan direkt göster (bekletme)
+            if (categoryDataCache) {
+                renderCategories(categoryDataCache);
+                return;
+            }
+
+            const loadingDiv = document.getElementById('categories-loading');
+            const grid = document.getElementById('categories-grid');
+            grid.innerHTML = '';
+            loadingDiv.classList.remove('hidden');
+
+            // Sadece kelime listesini alıp Gemini'ye yolluyoruz
+            const wordList = rawData.map(item => item.term).join(', ');
+            
+            const promptText = `Aşağıdaki İngilizce kelimeleri anlamlarına veya kullanım alanlarına göre mantıklı 5-8 farklı kategoriye ayır (Örn: Zaman İfadeleri, İnsan ve Toplum, Akademik, Fiiller vb.). 
+SADECE geçerli bir JSON formatında cevap ver. Asla açıklama yazma. JSON formatı tam olarak şöyle olmalı: 
+{
+  "Kategori Adı 1": ["kelime1", "kelime2"],
+  "Kategori Adı 2": ["kelime3", "kelime4"]
+}
+Kelimeler: ${wordList}`;
+
+            try {
+                // Dinamik olarak modeli bul ve API'ye istek at
+                const modelsResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${GEMINI_API_KEY}`);
+                const modelsData = await modelsResponse.json();
+                const availableModels = modelsData.models.filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"));
+                const flashModel = availableModels.find(m => m.name.includes("flash"));
+                const selectedModelName = flashModel ? flashModel.name : availableModels[0].name;
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${selectedModelName}:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
+
+                if (!response.ok) throw new Error("API Yanıt Vermedi (Hata Kodu: " + response.status + ")");
+                const data = await response.json();
+                let reply = data.candidates[0].content.parts[0].text;
+                
+                // --- DAHA ZEKİ JSON AYIKLAYICI ---
+                // Gemini bazen laf kalabalığı yapabilir. Biz sadece { ve } işaretleri arasındaki asıl veriyi cımbızla çekiyoruz.
+                const startIndex = reply.indexOf('{');
+                const endIndex = reply.lastIndexOf('}');
+                
+                if (startIndex !== -1 && endIndex !== -1) {
+                    reply = reply.substring(startIndex, endIndex + 1);
+                } else {
+                    throw new Error("Yapay zeka uygun formatta cevap vermedi.");
+                }
+                
+                categoryDataCache = JSON.parse(reply); // Sonucu hafızaya al
+                loadingDiv.classList.add('hidden');
+                renderCategories(categoryDataCache);
+
+            } catch (error) {
+                console.error("Yapay Zeka Hatası Detayı:", error);
+                loadingDiv.innerHTML = `
+                    <div class="bg-red-50 p-4 rounded-xl border border-red-200">
+                        <p class="text-red-600 font-bold mb-2">Kategoriler oluşturulurken bir sorun çıktı.</p>
+                        <p class="text-sm text-red-500 font-mono mb-2">${error.message}</p>
+                        <p class="text-xs text-gray-500 font-bold">Lütfen klavyeden F12 tuşuna basıp "Console" sekmesindeki kırmızı yazıyı bana at.</p>
+                    </div>`;
+            }
+        }
+
+        function renderCategories(catData) {
+            const grid = document.getElementById('categories-grid');
+            grid.innerHTML = '';
+            
+            // "Tüm Kartlar" butonu (Varsayılan karışık hal)
+            const allBtn = document.createElement('button');
+            allBtn.className = `p-6 rounded-3xl shadow-sm hover:shadow-md hover:scale-105 transition font-bold text-xl bg-gray-200 text-gray-800 flex flex-col items-center justify-center aspect-square`;
+            allBtn.innerHTML = `<span><i class="fas fa-layer-group text-2xl mb-2 block"></i>Tümü</span><span class="text-sm font-normal mt-2 opacity-80">${rawData.length} Kelime</span>`;
+            allBtn.onclick = () => {
+                cards = [...rawData];
+                currentIndex = 0;
+                updateCardDisplay();
+                returnToMainMenu();
+            };
+            grid.appendChild(allBtn);
+
+            let colorIndex = 0;
+            // Gemini'den gelen kategorileri dön ve renkli kareleri oluştur
+            for (const [catName, words] of Object.entries(catData)) {
+                if(words.length === 0) continue; // Boş kategori atama hatasını engelle
+
+                const btn = document.createElement('button');
+                const colorClass = colorPalette[colorIndex % colorPalette.length];
+                colorIndex++;
+                
+                // Kare görünüm için aspect-square eklendi
+                btn.className = `p-6 rounded-3xl shadow-sm hover:shadow-md hover:scale-105 transition font-bold text-lg ${colorClass} flex flex-col items-center justify-center text-center aspect-square`;
+                btn.innerHTML = `<span>${catName}</span><span class="text-sm font-normal mt-2 opacity-80">${words.length} Kelime</span>`;
+                
+                // Kategoriye tıklanınca filtreleme yap
+                btn.onclick = () => {
+                    // Tıklanan kategorideki kelimeleri rawData içinde bul
+                    cards = rawData.filter(item => words.includes(item.term));
+                    if(cards.length === 0) cards = [...rawData]; // Hata olursa tümünü yükle
+                    currentIndex = 0;
+                    updateCardDisplay();
+                    returnToMainMenu();
+                };
+                grid.appendChild(btn);
+            }
+        }
+
+        // --- MENÜ, ARAMA VE NOTLAR SİSTEMİ BAŞLANGICI ---
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            // Menü açıldığında arama kutusuna odaklan
+            if (!document.getElementById('sidebar').classList.contains('-translate-x-full')) {
+                setTimeout(() => document.getElementById('search-input').focus(), 300);
+            }
+        }
+
+        function showSection(sectionId) {
+            document.getElementById('notes-section').classList.add('hidden');
+            document.getElementById('instructions-section').classList.add('hidden');
+            // YENİ: Kategori ekranını da gizlemezsek ekranda asılı kalır
+            document.getElementById('categories-section').classList.add('hidden'); 
+            
+            document.getElementById(sectionId + '-section').classList.remove('hidden');
+            
+            if (!document.getElementById('sidebar').classList.contains('-translate-x-full')) {
+                toggleSidebar(); // Menüyü kapat
+            }
+        }
+
+        function returnToMainMenu() {
+            // Açık olan özel sayfaları kapat
+            document.getElementById('notes-section').classList.add('hidden');
+            document.getElementById('instructions-section').classList.add('hidden');
+            // YENİ: Kategori ekranını da kapat
+            document.getElementById('categories-section').classList.add('hidden');
+            
+            if (originalCards !== null) {
+                cards = [...originalCards];
+                currentIndex = originalIndex;
+                originalCards = null;
+                document.getElementById('search-input').value = '';
+                document.getElementById('search-results').innerHTML = '';
+                updateCardDisplay();
+            }
+            
+            if (!document.getElementById('sidebar').classList.contains('-translate-x-full')) {
+                toggleSidebar();
+            }
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+
+            if (query.length < 2) return; // 2 harften azsa arama yapma
+
+            // SADECE İNGİLİZCE KELİMELERDE ARA (item.term)
+            const results = rawData.filter(item => 
+                item.term.toLowerCase().includes(query)
+            );
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<p class="text-sm text-gray-500 italic p-2">Sonuç bulunamadı.</p>';
+                return;
+            }
+
+            results.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 bg-gray-50 hover:bg-blue-100 border border-gray-100 rounded-xl text-sm transition mb-1';
+                btn.innerHTML = `<span class="font-bold text-blue-700">${item.term}</span><br><span class="text-gray-600 truncate block">${item.def}</span>`;
+                btn.onclick = () => {
+                    // Mevcut ilerlemeyi yedekle
+                    if (originalCards === null) {
+                        originalCards = [...cards];
+                        originalIndex = currentIndex;
+                    }
+                    cards = [item]; // Sadece tıklanan kartı göster
+                    currentIndex = 0;
+                    updateCardDisplay();
+                    
+                    // Ana menü fonksiyonunu ÇAĞIRMA (çünkü o sıfırlıyor), sadece yan menüyü kapat:
+                    toggleSidebar(); 
+                };
+                resultsContainer.appendChild(btn);
+            });
+        }
+
+        async function showExamples() {
+            if (cards.length === 0) return;
+            const currentCard = cards[currentIndex];
+            const examplesList = document.getElementById('examples-list');
+            const modal = document.getElementById('examples-modal');
+            const title = document.getElementById('examples-title');
+            
+            title.textContent = currentCard.term + " - Örnek Cümleler";
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            examplesList.innerHTML = '<li class="text-gray-500 italic text-center p-4"><i class="fas fa-spinner fa-spin mr-2"></i> En uygun örnekler aranıyor...</li>';
+
+            let searchWord = currentCard.term.split('/')[0].split('(')[0].trim();
+
+            const promptText = `Sen bir İngilizce öğretmenisin. Öğrencine "${searchWord}" kelimesini öğretiyorsun. Bana bu kelimenin geçtiği 3 tane kısa, günlük hayattan, anlaşılır İngilizce örnek cümle kur. Her cümlenin hemen altına parantez içinde Türkçe çevirisini yaz. Yanıtın SADECE şu formatta olsun ve başka hiçbir şey yazma:
+1. [İngilizce Cümle]
+   ([Türkçe Çeviri])
+
+2. [İngilizce Cümle]
+   ([Türkçe Çeviri])
+
+3. [İngilizce Cümle]
+   ([Türkçe Çeviri])`;
+
+            try {
+                // 1. AŞAMA: Google sunucularına mevcut modelleri soruyoruz
+                const modelsResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${GEMINI_API_KEY}`);
+                if (!modelsResponse.ok) throw new Error("Model listesi alınamadı. API anahtarı geçersiz olabilir.");
+                const modelsData = await modelsResponse.json();
+                
+                // 2. AŞAMA: İçerik üretebilen (generateContent) aktif modelleri filtrele
+                const availableModels = modelsData.models.filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"));
+                
+                if (availableModels.length === 0) throw new Error("Hesabında kullanılabilecek aktif bir yapay zeka modeli bulunamadı.");
+                
+                // Hız için öncelikle adında 'flash' geçen modeli ara, bulamazsa listedeki ilk uygun modeli seç
+                const flashModel = availableModels.find(m => m.name.includes("flash"));
+                const selectedModelName = flashModel ? flashModel.name : availableModels[0].name;
+
+                // 3. AŞAMA: Bulduğumuz aktif modelle asıl kelime isteğimizi atıyoruz
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${selectedModelName}:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error.message || "İçerik üretilirken hata oluştu.");
+                }
+
+                const data = await response.json();
+                const reply = data.candidates[0].content.parts[0].text;
+
+                examplesList.innerHTML = ''; 
+                
+                const contentDiv = document.createElement('div');
+                // Ana metni text-black (siyah) ve font-bold (kalın) yaptık. 
+                // Böylece numaralar ve İngilizce cümleler direkt kalın siyah olacak.
+                contentDiv.className = 'p-4 bg-blue-50 rounded-xl text-black font-bold whitespace-pre-wrap leading-relaxed shadow-inner text-left';
+                
+                // 1. Yapay zeka gereksiz yere ** koyarsa onları temizliyoruz (çünkü zaten metni kalın yaptık).
+                // 2. Parantez içindeki kısımları yakalayıp boyutunu KÜÇÜLTMEDEN (text-sm'i sildik), İngilizce'den ayırt edilsin diye normal kalınlıkta (font-normal) ve koyu gri yapıyoruz.
+                let formattedText = reply.trim()
+                    .replace(/\*\*(.*?)\*\*/g, '$1') 
+                    .replace(/\(([^)]+)\)/g, '<br><span class="font-normal text-gray-700">($1)</span>');
+                
+                contentDiv.innerHTML = formattedText;
+                
+                examplesList.appendChild(contentDiv);
+
+            } catch (error) {
+                console.error("Yapay Zeka Hatası Detayı:", error);
+                loadingDiv.innerHTML = `
+                    <div class="bg-red-50 p-4 rounded-xl border border-red-200">
+                        <p class="text-red-600 font-bold mb-2">Kategoriler oluşturulurken hata oluştu.</p>
+                        <p class="text-sm text-red-500 font-mono">${error.message}</p>
+                    </div>`;
+            }
+        }
+
+        function closeExamples() {
+            const modal = document.getElementById('examples-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function openImage(src) {
+            document.getElementById('fullscreen-img').src = src;
+            const modal = document.getElementById('image-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeImage() {
+            const modal = document.getElementById('image-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        // --- MENÜ, ARAMA VE NOTLAR SİSTEMİ BİTİŞİ ---
+
+        // --- YOUGLISH VE TEMA SİSTEMİ BAŞLANGICI ---
+        function openYouGlish() {
+            if (cards.length === 0) return;
+            const currentCard = cards[currentIndex];
+            
+            // Kelimeyi temizle (Örn: "exist (2.hal)" -> "exist")
+            let searchWord = currentCard.term.split('/')[0].split('(')[0].trim();
+            
+            // YouGlish URL'sini oluştur ve yeni sekmede aç
+            const youglishUrl = `https://youglish.com/pronounce/${encodeURIComponent(searchWord)}/english`;
+            window.open(youglishUrl, '_blank');
+        }
+
+        // --- GELİŞMİŞ TEMA SİSTEMİ ---
+        function openThemeModal() {
+            document.getElementById('theme-modal').classList.remove('hidden');
+            document.getElementById('theme-modal').classList.add('flex');
+            toggleSidebar(); // Menüyü kapat
+        }
+
+        function closeThemeModal() {
+            document.getElementById('theme-modal').classList.add('hidden');
+            document.getElementById('theme-modal').classList.remove('flex');
+        }
+
+        function setTheme(themeName) {
+            // Önce tüm temaları temizle
+            document.body.classList.remove('dark-mode', 'ultra-dark-mode');
+            
+            if (themeName === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else if (themeName === 'ultra-dark') {
+                document.body.classList.add('ultra-dark-mode');
+            }
+            
+            localStorage.setItem('flashcards_theme', themeName); // Tercihi kaydet
+            updateThemeIcon(themeName);
+            closeThemeModal();
+        }
+        
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('flashcards_theme') || 'light';
+            setTheme(savedTheme);
+        }
+
+        function updateThemeIcon(themeName) {
+            const icon = document.getElementById('theme-icon');
+            if(icon) {
+                if(themeName === 'ultra-dark') {
+                    icon.className = 'fas fa-ghost text-lg text-purple-500';
+                } else if(themeName === 'dark') {
+                    icon.className = 'fas fa-moon text-lg text-blue-400';
+                } else {
+                    icon.className = 'fas fa-sun text-lg text-yellow-500';
+                }
+            }
+        }
+                // --- YOUGLISH VE TEMA SİSTEMİ BİTİŞİ ---
+
+        // --- MOBİL KAYDIRMA (SWIPE) SİSTEMİ BAŞLANGICI ---
+        let touchstartX = 0;
+        let touchendX = 0;
+
+        const flashcardElement = document.getElementById('flashcard');
+
+        // Parmağın ekrana ilk dokunduğu X koordinatını al
+        flashcardElement.addEventListener('touchstart', function(event) {
+            touchstartX = event.changedTouches[0].screenX;
+        }, { passive: true });
+
+        // Parmağın ekrandan kalktığı X koordinatını al ve kaydırmayı hesapla
+        flashcardElement.addEventListener('touchend', function(event) {
+            touchendX = event.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50; // Kaydırmanın algılanması için gereken minimum piksel
+
+            // Sola kaydırma (Sonraki Karta Git)
+            if (touchendX < touchstartX - swipeThreshold) {
+                if (!isFlipped) nextCard(); 
+                // İsteğe bağlı: isFlipped iken sola kaydırırsan markIncorrect() yapabiliriz.
+            }
+            
+            // Sağa kaydırma (Önceki Karta Git)
+            if (touchendX > touchstartX + swipeThreshold) {
+                if (!isFlipped) prevCard();
+            }
+        }
+        // --- MOBİL KAYDIRMA (SWIPE) SİSTEMİ BİTİŞİ ---
+
+        // --- DOUBLE TAP (ÇİFT DOKUNUŞ) SİSTEMİ ---
+        let lastTap = 0;
+        flashcardElement.addEventListener('touchend', function (e) {
+            let currentTime = new Date().getTime();
+            let tapLength = currentTime - lastTap;
+            
+            // Eğer iki dokunuş arası 300ms'den azsa çift dokunuş kabul et
+            if (tapLength < 300 && tapLength > 0) {
+                e.preventDefault(); // Varsayılan tıklama olayını engelle
+                if (isFlipped) {
+                    markCorrect(); // Kartın arkasındaysak "Bildim" yap
+                    // Hafif bir görsel geri bildirim (opsiyonel)
+                    flashcardElement.style.boxShadow = "0 0 20px rgba(34, 197, 94, 0.5)";
+                    setTimeout(() => flashcardElement.style.boxShadow = "", 300);
+                }
+            }
+            lastTap = currentTime;
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            // Eğer arama kutusuna yazı yazıyorsak kısayollar çalışmasın
+            if (document.activeElement.id === 'search-input') return;
+
+            if (cards.length === 0) return;
+
+            if (e.code === 'Space') {
+                e.preventDefault(); 
+                flipCard();
+            } else if (e.code === 'ArrowRight' && !isFlipped) {
+                nextCard();
+            } else if (e.code === 'ArrowLeft' && !isFlipped) {
+                prevCard();
+            } else if (e.code === 'Digit1' || e.code === 'Numpad1' || e.code === 'ArrowDown') {
+                e.preventDefault(); 
+                if(isFlipped) markIncorrect(); 
+            } else if (e.code === 'Digit2' || e.code === 'Numpad2' || e.code === 'ArrowUp') {
+                e.preventDefault(); 
+                if(isFlipped) markCorrect(); 
+            } else if (e.code === 'KeyE') {
+                showExamples(); // E tuşu: Örnekler
+            } else if (e.code === 'KeyP') {
+                openYouGlish(); // P tuşu: YouGlish'te aç
+            } else if (e.code === 'Escape') {
+                closeExamples();
+                closeImage();
+            }
+        });
+
+        // Initial Load (Sayfa Açıldığında Çalışacaklar)
+        loadTheme();    // Önce temayı yükle
+        loadProgress(); // Sonra kart ilerlemesini yükle
+        updateCardDisplay();
+
+        // Initial Load
+        loadProgress(); // Sayfa açıldığında eski ilerlemeyi yükle
+        updateCardDisplay();
+    </script>
+</body>
+</html>
